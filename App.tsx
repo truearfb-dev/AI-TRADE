@@ -135,10 +135,10 @@ const App: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-trade-bg text-white font-sans selection:bg-trade-accent selection:text-trade-bg grid-bg animate-in fade-in duration-700">
       <Header lang={language} setLang={setLanguage} />
       
-      {/* Live Social Proof */}
+      {/* Live Social Proof - Floating at bottom */}
       <LiveNotification lang={language} />
 
-      <main className="flex-grow p-4 flex flex-col items-center justify-center w-full max-w-md mx-auto relative pb-20">
+      <main className="flex-grow p-4 flex flex-col items-center justify-start pt-8 w-full max-w-md mx-auto relative pb-32">
         
         {/* Conditional Rendering: Scanner View or Result View */}
         {!signal ? (
