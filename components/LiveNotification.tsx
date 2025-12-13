@@ -55,7 +55,7 @@ const LiveNotification: React.FC<LiveNotificationProps> = ({ lang }) => {
   return (
     <div 
       className={`
-        fixed bottom-24 left-0 w-full z-40 flex justify-center px-4 pointer-events-none
+        fixed bottom-20 left-0 w-full z-40 flex justify-center px-4 pointer-events-none
         transition-all duration-500 ease-out
         ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
       `}

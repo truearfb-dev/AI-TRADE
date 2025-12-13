@@ -138,7 +138,7 @@ const App: React.FC = () => {
       {/* Live Social Proof - Floating at bottom */}
       <LiveNotification lang={language} />
 
-      <main className="flex-grow p-4 flex flex-col items-center justify-start pt-8 w-full max-w-md mx-auto relative pb-32">
+      <main className="flex-grow p-4 flex flex-col items-center justify-center w-full max-w-md mx-auto relative z-0">
         
         {/* Conditional Rendering: Scanner View or Result View */}
         {!signal ? (
