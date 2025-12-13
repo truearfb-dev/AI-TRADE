@@ -1,5 +1,4 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import ScannerDisplay from './components/ScannerDisplay';
@@ -20,6 +19,19 @@ const App: React.FC = () => {
   const [selectedPair, setSelectedPair] = useState(TRADING_PAIRS[0].name);
 
   const t = TRANSLATIONS[language];
+
+  // Register Service Worker for PWA capabilities
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('Service Worker registered with scope:', registration.scope);
+        })
+        .catch((error) => {
+          console.error('Service Worker registration failed:', error);
+        });
+    }
+  }, []);
 
   const generateSignal = useCallback((pairName: string) => {
     // Random direction (50/50)
@@ -47,6 +59,14 @@ const App: React.FC = () => {
       const newSignal = generateSignal(selectedPair);
       setSignal(newSignal);
       setIsScanning(false);
+      
+      // Trigger notification if permission is granted
+      if (Notification.permission === 'granted') {
+         new Notification(`Pocket AI: ${newSignal.pair}`, {
+            body: `${newSignal.direction} Signal Detected! Accuracy: ${newSignal.accuracy}%`,
+            icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
+         });
+      }
     }, 4000); // 4 seconds total scan time
   };
 
