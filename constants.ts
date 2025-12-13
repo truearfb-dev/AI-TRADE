@@ -1,5 +1,4 @@
-
-import { MarketPair, Language } from './types';
+import { MarketPair } from './types';
 
 export const TRADING_PAIRS: MarketPair[] = [
   { name: 'EUR/USD', volatility: '94%' },
