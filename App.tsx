@@ -132,7 +132,7 @@ const App: React.FC = () => {
   }
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden flex flex-col bg-trade-bg text-white font-sans selection:bg-trade-accent selection:text-trade-bg grid-bg animate-in fade-in duration-700 fixed inset-0">
+    <div className="h-[100dvh] w-full overflow-hidden flex flex-col bg-trade-bg text-white font-sans selection:bg-trade-accent selection:text-trade-bg grid-bg animate-in fade-in duration-700 fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       <Header lang={language} setLang={setLanguage} />
       
       {/* Live Social Proof - Floating at bottom */}

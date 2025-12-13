@@ -86,7 +86,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
   };
 
   return (
-    <div className="h-[100dvh] w-full overflow-hidden flex items-center justify-center p-4 bg-trade-bg grid-bg relative fixed inset-0">
+    <div className="h-[100dvh] w-full overflow-hidden flex items-center justify-center p-4 bg-trade-bg grid-bg relative fixed inset-0 pt-[env(safe-area-inset-top)] pb-[env(safe-area-inset-bottom)]">
       {/* Background Ambience */}
       <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-trade-accent to-transparent opacity-20"></div>
       
