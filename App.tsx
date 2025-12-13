@@ -33,11 +33,31 @@ const App: React.FC = () => {
     }
   }, []);
 
+  // --- LOGIC FOR NOTIFICATIONS ---
+  const sendNotification = (title: string, body: string) => {
+    if (Notification.permission === 'granted') {
+      // Check if service worker is ready to use "showNotification" (better for mobile)
+      if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then((registration) => {
+          registration.showNotification(title, {
+            body: body,
+            icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png",
+            vibrate: [200, 100, 200], // Vibration pattern
+            tag: 'trading-signal' // Replaces old notification with new one if stacked
+          } as any);
+        });
+      } else {
+        // Fallback for desktop/simple testing
+        new Notification(title, {
+          body: body,
+          icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
+        });
+      }
+    }
+  };
+
   const generateSignal = useCallback((pairName: string) => {
-    // Random direction (50/50)
     const direction: TradeDirection = Math.random() > 0.5 ? 'CALL' : 'PUT';
-    
-    // Random accuracy between 88% and 98%
     const accuracy = Math.floor(Math.random() * (98 - 88 + 1)) + 88;
 
     return {
@@ -60,15 +80,37 @@ const App: React.FC = () => {
       setSignal(newSignal);
       setIsScanning(false);
       
-      // Trigger notification if permission is granted
-      if (Notification.permission === 'granted') {
-         new Notification(`Pocket AI: ${newSignal.pair}`, {
-            body: `${newSignal.direction} Signal Detected! Accuracy: ${newSignal.accuracy}%`,
-            icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
-         });
-      }
-    }, 4000); // 4 seconds total scan time
+      // CUSTOMIZE YOUR NOTIFICATION TEXT HERE
+      const emoji = newSignal.direction === 'CALL' ? '🟢 ⬆️' : '🔴 ⬇️';
+      const title = `SIGNAL: ${newSignal.pair} ${emoji}`;
+      const body = `Direction: ${newSignal.direction}\nAccuracy: ${newSignal.accuracy}%\nTimeframe: M1`;
+      
+      sendNotification(title, body);
+
+    }, 4000); 
   };
+
+  // --- AUTOMATIC BACKGROUND SIGNALS (SIMULATION) ---
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // Simulate an incoming signal every 5 minutes (300000ms) purely for notification
+    const interval = setInterval(() => {
+      // Only notify if user is NOT currently looking at a signal card
+      if (!signal) {
+        const randomPair = TRADING_PAIRS[Math.floor(Math.random() * TRADING_PAIRS.length)].name;
+        const autoSignal = generateSignal(randomPair);
+        
+        const emoji = autoSignal.direction === 'CALL' ? '🟢' : '🔴';
+        const title = `New Opportunity: ${randomPair}`;
+        const body = `${emoji} ${autoSignal.direction} Confirmed (${autoSignal.accuracy}%)`;
+        
+        sendNotification(title, body);
+      }
+    }, 120000); // Trigger every 2 minutes for testing (change to higher value later)
+
+    return () => clearInterval(interval);
+  }, [isAuthenticated, signal, generateSignal]);
 
   const handleReset = () => {
     setSignal(null);
