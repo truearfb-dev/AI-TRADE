@@ -2,7 +2,9 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <title>Pocket AI Trader</title>
     <!-- Keeping Tailwind CDN for simplicity, though npm install is better for heavy production -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,6 +44,16 @@
       body {
         background-color: #0a192f;
         color: #e6f1ff;
+        /* Disable text selection and highlight for app-like feel */
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+        /* Handle Safe Areas for iPhone X+ */
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+        min-height: 100vh;
+        overscroll-behavior-y: none; /* Prevent pull-to-refresh effect */
       }
       .grid-bg {
         background-size: 40px 40px;

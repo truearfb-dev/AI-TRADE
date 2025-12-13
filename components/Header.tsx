@@ -13,7 +13,7 @@ const Header: React.FC<HeaderProps> = ({ lang, setLang }) => {
   const t = TRANSLATIONS[lang];
 
   return (
-    <header className="w-full p-4 border-b border-white/10 bg-trade-card/50 backdrop-blur-md sticky top-0 z-50">
+    <header className="w-full p-4 border-b border-white/10 bg-trade-card/80 backdrop-blur-md sticky top-0 z-50">
       <div className="max-w-md mx-auto flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="relative">
@@ -30,13 +30,8 @@ const Header: React.FC<HeaderProps> = ({ lang, setLang }) => {
           </div>
         </div>
         
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
            <LanguageSelector lang={lang} setLang={setLang} />
-           
-           <div className="hidden sm:flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              <span className="text-xs font-mono text-emerald-500">{t.statusOnline}</span>
-           </div>
         </div>
       </div>
     </header>

