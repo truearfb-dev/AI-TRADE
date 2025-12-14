@@ -1,6 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, Clock, Target, BarChart2, Hourglass } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Target, BarChart2, Hourglass, RotateCcw, Zap } from 'lucide-react';
 import { SignalData, Language } from '../types';
 import { TRANSLATIONS } from '../constants';
 
@@ -22,13 +21,24 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal, onReset, lang }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, [timeLeft]);
+
+  const isExpired = timeLeft === 0;
+  const isUrgent = timeLeft <= 10 && !isExpired;
+
+  // Function to determine accuracy color independent of signal direction
+  const getAccuracyColor = (accuracy: number) => {
+    if (accuracy >= 90) return 'text-emerald-400 drop-shadow-[0_0_8px_rgba(52,211,153,0.5)]'; // High - Green
+    if (accuracy >= 80) return 'text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.5)]';  // Medium - Yellow
+    return 'text-rose-500 drop-shadow-[0_0_8px_rgba(244,63,94,0.5)]';     // Low - Red
+  };
   
   return (
     <div className="animate-in fade-in zoom-in duration-500 w-full">
       {/* Main Card */}
       <div className={`
-        relative overflow-hidden rounded-2xl border-2 shadow-[0_0_40px_rgba(0,0,0,0.3)]
+        relative overflow-hidden rounded-2xl border-2 shadow-[0_0_40px_rgba(0,0,0,0.3)] transition-all duration-500
         ${isCall ? 'border-emerald-500 bg-emerald-500/10' : 'border-rose-500 bg-rose-500/10'}
+        ${isExpired ? 'grayscale-[0.5] opacity-90' : ''}
       `}>
         
         {/* Glowing Background Effect */}
@@ -60,12 +70,21 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal, onReset, lang }) => {
           </div>
 
           {/* Countdown Timer */}
-          <div className="w-full bg-black/40 rounded-lg p-2 mb-6 flex items-center justify-between px-4 border border-white/5">
+          <div className={`
+            w-full rounded-lg p-2 mb-6 flex items-center justify-between px-4 border transition-all duration-300
+            ${isExpired ? 'bg-red-500/10 border-red-500/30' : 'bg-black/40 border-white/5'}
+            ${isUrgent ? 'border-red-500/50 bg-red-500/10 shadow-[0_0_20px_rgba(239,68,68,0.3)]' : ''}
+          `}>
              <span className="text-[10px] text-gray-400 uppercase tracking-wider flex items-center gap-2">
-               <Hourglass size={12} className="animate-spin [animation-duration:3s]" />
+               <Hourglass size={12} className={!isExpired ? "animate-spin [animation-duration:3s]" : ""} />
                {t.timerLabel}
              </span>
-             <span className={`font-mono font-bold text-lg ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+             <span className={`
+               font-mono font-bold transition-all duration-300
+               ${isUrgent 
+                 ? 'text-red-500 text-2xl scale-110 animate-[pulse_0.5s_ease-in-out_infinite] drop-shadow-[0_0_8px_rgba(239,68,68,0.8)]' 
+                 : 'text-lg text-white'}
+             `}>
                00:{timeLeft.toString().padStart(2, '0')}
              </span>
           </div>
@@ -90,18 +109,34 @@ const SignalCard: React.FC<SignalCardProps> = ({ signal, onReset, lang }) => {
                <div className="flex items-center gap-2 text-gray-400 text-xs">
                 <Target size={14} /> {t.labelAccuracy}
               </div>
-              <span className={`text-2xl font-bold font-mono ${isCall ? 'text-emerald-400' : 'text-rose-400'}`}>
+              <span className={`text-2xl font-bold font-mono ${getAccuracyColor(signal.accuracy)}`}>
                 {signal.accuracy}%
               </span>
             </div>
           </div>
 
-          <button 
-            onClick={onReset}
-            className="text-sm text-gray-400 hover:text-white underline decoration-dotted underline-offset-4 transition-colors"
-          >
-            {t.btnNewScan}
-          </button>
+          {/* Action Button - Dynamic based on Timer */}
+          {isExpired ? (
+            <button 
+              onClick={onReset}
+              className="w-full relative group overflow-hidden bg-trade-accent hover:bg-[#4cdbb9] text-trade-bg font-black text-lg py-4 rounded-xl shadow-[0_0_20px_rgba(100,255,218,0.5)] hover:shadow-[0_0_40px_rgba(100,255,218,0.7)] transition-all transform hover:scale-[1.02] active:scale-95 animate-[pulse_2s_infinite]"
+            >
+              <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-[-20deg]"></div>
+              <div className="relative flex items-center justify-center gap-3">
+                <Zap className="w-6 h-6 fill-current" />
+                <span>{t.btnNewScan.toUpperCase()}</span>
+              </div>
+            </button>
+          ) : (
+            <button 
+              onClick={onReset}
+              className="text-sm text-gray-400 hover:text-white underline decoration-dotted underline-offset-4 transition-colors flex items-center gap-2"
+            >
+              <RotateCcw size={12} />
+              {t.btnNewScan}
+            </button>
+          )}
+
         </div>
       </div>
     </div>

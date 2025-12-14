@@ -55,12 +55,12 @@ const LiveNotification: React.FC<LiveNotificationProps> = ({ lang }) => {
   return (
     <div 
       className={`
-        fixed bottom-20 left-0 w-full z-40 flex justify-center px-4 pointer-events-none
+        fixed top-[4.5rem] left-0 w-full z-40 flex justify-center px-4 pointer-events-none
         transition-all duration-500 ease-out
-        ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
+        ${isVisible ? 'translate-y-0 opacity-100' : '-translate-y-4 opacity-0'}
       `}
     >
-      <div className="bg-[#112240]/90 backdrop-blur-md border border-emerald-500/30 rounded-full py-2.5 px-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center w-auto max-w-full">
+      <div className="bg-[#112240]/90 backdrop-blur-md border border-emerald-500/30 rounded-full py-2.5 px-5 shadow-[0_8px_32px_rgba(0,0,0,0.4)] flex items-center w-auto max-w-full ring-1 ring-white/5">
         
         {/* Icon Container - Prevent shrinking */}
         <div className="bg-emerald-500/10 p-1.5 rounded-full shrink-0 mr-3">
@@ -69,7 +69,7 @@ const LiveNotification: React.FC<LiveNotificationProps> = ({ lang }) => {
 
         {/* Text Container - Allow growth but handle overflow */}
         <div className="flex flex-col flex-1 min-w-0 mr-4">
-          <span className="text-[11px] text-gray-400 font-medium leading-tight truncate max-w-[150px]">
+          <span className="text-[11px] text-gray-400 font-medium leading-tight truncate max-w-[200px]">
             {notification.userName} <span className="opacity-50 mx-0.5">|</span> {notification.pair}
           </span>
           <span className="text-sm font-bold text-white leading-tight whitespace-nowrap">

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Search, Wifi, Crosshair } from 'lucide-react';
 import { TRANSLATIONS } from '../constants';
@@ -18,13 +17,6 @@ const ScannerDisplay: React.FC<ScannerDisplayProps> = ({ isScanning, selectedPai
       
       {/* Background Grid */}
       <div className="absolute inset-0 grid-bg opacity-30 pointer-events-none"></div>
-
-      {/* Static Crosshair Overlay */}
-      <div className="absolute inset-0 z-10 opacity-20 pointer-events-none">
-        <div className="absolute top-1/2 left-0 w-full h-[1px] bg-white"></div>
-        <div className="absolute left-1/2 top-0 h-full w-[1px] bg-white"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border border-white w-2/3 h-2/3 rounded-full"></div>
-      </div>
 
       {/* Radar Scan Effect */}
       {isScanning && (

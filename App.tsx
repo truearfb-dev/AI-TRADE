@@ -14,7 +14,7 @@ import { Radar, ChevronDown } from 'lucide-react';
 const SESSION_DURATION_MS = 1 * 60 * 60 * 1000; // 1 Hour
 
 const App: React.FC = () => {
-  const [language, setLanguage] = useState<Language>('pt');
+  const [language, setLanguage] = useState<Language>('en');
   
   // Initialize authentication state from localStorage
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -83,7 +83,11 @@ const App: React.FC = () => {
 
   const generateSignal = useCallback((pairName: string) => {
     const direction: TradeDirection = Math.random() > 0.5 ? 'CALL' : 'PUT';
-    const accuracy = Math.floor(Math.random() * (98 - 88 + 1)) + 88;
+    
+    // Generate accuracy between 50% and 95%
+    const minAccuracy = 50;
+    const maxAccuracy = 95;
+    const accuracy = Math.floor(Math.random() * (maxAccuracy - minAccuracy + 1)) + minAccuracy;
 
     return {
       pair: pairName,
