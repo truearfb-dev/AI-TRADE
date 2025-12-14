@@ -11,9 +11,25 @@ import { SignalData, TradeDirection, Language } from './types';
 import { TRADING_PAIRS, TRANSLATIONS } from './constants';
 import { Radar, ChevronDown } from 'lucide-react';
 
+const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('pt');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Initialize authentication state from localStorage
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    const savedTimestamp = localStorage.getItem('pocket_ai_login_time');
+    if (savedTimestamp) {
+      const loginTime = parseInt(savedTimestamp, 10);
+      const currentTime = Date.now();
+      // Check if session is still valid (not expired)
+      if (currentTime - loginTime < SESSION_DURATION_MS) {
+        return true;
+      }
+    }
+    return false;
+  });
+
   const [isScanning, setIsScanning] = useState(false);
   const [signal, setSignal] = useState<SignalData | null>(null);
   const [selectedPair, setSelectedPair] = useState(TRADING_PAIRS[0].name);
@@ -117,6 +133,8 @@ const App: React.FC = () => {
   };
 
   const handleLogin = () => {
+    // Save current timestamp to localStorage on successful login
+    localStorage.setItem('pocket_ai_login_time', Date.now().toString());
     setIsAuthenticated(true);
   };
 
