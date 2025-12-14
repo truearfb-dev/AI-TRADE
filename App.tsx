@@ -33,6 +33,7 @@ const App: React.FC = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [signal, setSignal] = useState<SignalData | null>(null);
   const [selectedPair, setSelectedPair] = useState(TRADING_PAIRS[0].name);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const t = TRANSLATIONS[language];
 
@@ -175,25 +176,48 @@ const App: React.FC = () => {
             {/* Controls Container */}
             <div className="w-full space-y-4">
               
-              {/* Asset Selector */}
-              <div className="w-full">
+              {/* Asset Selector (Custom Dropdown) */}
+              <div className="w-full relative z-20">
                 <label className="text-[10px] text-gray-400 font-mono tracking-widest uppercase mb-1.5 block ml-1">
                   {t.selectAsset}
                 </label>
                 <div className="relative">
-                  <select 
-                    value={selectedPair}
-                    onChange={(e) => setSelectedPair(e.target.value)}
-                    disabled={isScanning}
-                    className="w-full appearance-none bg-trade-card border border-white/10 rounded-xl px-4 py-3 font-mono font-bold text-white shadow-sm focus:outline-none focus:border-trade-accent/50 focus:shadow-[0_0_15px_rgba(100,255,218,0.1)] transition-all disabled:opacity-50"
+                  <button
+                    onClick={() => !isScanning && setIsDropdownOpen(!isDropdownOpen)}
+                    className={`w-full bg-trade-card border border-white/10 rounded-xl px-4 py-3 font-mono font-bold text-white shadow-sm flex items-center justify-between focus:outline-none focus:border-trade-accent/50 transition-all ${isScanning ? 'opacity-50 cursor-not-allowed' : 'active:scale-[0.99]'}`}
                   >
-                    {TRADING_PAIRS.map((pair) => (
-                      <option key={pair.name} value={pair.name}>
-                        {pair.name} &nbsp;&nbsp;&nbsp; {getVolatilityIndicator(pair.volatility)}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+                    <span className="flex items-center gap-2">
+                       {selectedPair}
+                    </span>
+                    <div className="flex items-center gap-3">
+                       <span>
+                         {getVolatilityIndicator(TRADING_PAIRS.find(p => p.name === selectedPair)?.volatility || '0%')}
+                       </span>
+                       <ChevronDown size={16} className={`text-gray-400 transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                    </div>
+                  </button>
+
+                  {/* Custom Dropdown Menu */}
+                  {isDropdownOpen && (
+                    <>
+                      <div className="fixed inset-0 z-30" onClick={() => setIsDropdownOpen(false)} />
+                      <div className="absolute top-full left-0 right-0 mt-2 bg-[#112240] border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[50vh] overflow-y-auto z-40 animate-in fade-in zoom-in-95 duration-200">
+                        {TRADING_PAIRS.map((pair) => (
+                          <button
+                            key={pair.name}
+                            onClick={() => {
+                              setSelectedPair(pair.name);
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/5 border-b border-white/5 last:border-0 transition-colors ${selectedPair === pair.name ? 'bg-trade-accent/10 text-trade-accent' : 'text-white'}`}
+                          >
+                            <span className="font-mono font-bold">{pair.name}</span>
+                            <span className="text-lg filter drop-shadow-md">{getVolatilityIndicator(pair.volatility)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
 
