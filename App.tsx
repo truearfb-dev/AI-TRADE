@@ -11,7 +11,7 @@ import { SignalData, TradeDirection, Language } from './types';
 import { TRADING_PAIRS, TRANSLATIONS } from './constants';
 import { Radar, ChevronDown } from 'lucide-react';
 
-const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+const SESSION_DURATION_MS = 1 * 60 * 60 * 1000; // 1 Hour
 
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('pt');
@@ -35,6 +35,14 @@ const App: React.FC = () => {
   const [selectedPair, setSelectedPair] = useState(TRADING_PAIRS[0].name);
 
   const t = TRANSLATIONS[language];
+
+  // Helper to get color indicator based on volatility
+  const getVolatilityIndicator = (volStr: string) => {
+    const vol = parseInt(volStr.replace('%', ''), 10);
+    if (vol >= 90) return '🟢'; // Green for high
+    if (vol >= 80) return '🟡'; // Yellow for medium
+    return '🔴'; // Red for low
+  };
 
   // Register Service Worker for PWA capabilities
   useEffect(() => {
@@ -181,7 +189,7 @@ const App: React.FC = () => {
                   >
                     {TRADING_PAIRS.map((pair) => (
                       <option key={pair.name} value={pair.name}>
-                        {pair.name} &mdash; Vol: {pair.volatility}
+                        {pair.name} &nbsp;&nbsp;&nbsp; {getVolatilityIndicator(pair.volatility)}
                       </option>
                     ))}
                   </select>

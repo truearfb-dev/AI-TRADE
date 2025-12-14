@@ -1,11 +1,32 @@
 import { MarketPair } from './types';
 
 export const TRADING_PAIRS: MarketPair[] = [
-  { name: 'EUR/USD', volatility: '94%' },
-  { name: 'GBP/USD', volatility: '91%' },
-  { name: 'USD/JPY', volatility: '89%' },
-  { name: 'BTC/USD', volatility: '96%' },
-  { name: 'AUD/CAD', volatility: '88%' },
+  // High Volatility (Green > 90%)
+  { name: 'EUR/USD', volatility: '96%' },
+  { name: 'GBP/USD', volatility: '95%' },
+  { name: 'XAU/USD', volatility: '94%' },
+  { name: 'BTC/USD', volatility: '93%' },
+  { name: 'ETH/USD', volatility: '92%' },
+  { name: 'USD/JPY', volatility: '91%' },
+  { name: 'USD/BRL', volatility: '91%' },
+  
+  // Medium Volatility (Yellow 80-89%)
+  { name: 'AUD/CAD', volatility: '89%' },
+  { name: 'USD/CAD', volatility: '88%' },
+  { name: 'EUR/JPY', volatility: '87%' },
+  { name: 'GBP/JPY', volatility: '86%' },
+  { name: 'NZD/USD', volatility: '85%' },
+  { name: 'AUD/USD', volatility: '84%' },
+  { name: 'USD/CHF', volatility: '82%' },
+  { name: 'US 30', volatility: '81%' },
+
+  // Low Volatility (Red < 80%)
+  { name: 'EUR/GBP', volatility: '79%' },
+  { name: 'EUR/AUD', volatility: '78%' },
+  { name: 'CAD/JPY', volatility: '76%' },
+  { name: 'GBP/CHF', volatility: '75%' },
+  { name: 'NZD/JPY', volatility: '74%' },
+  { name: 'CHF/JPY', volatility: '70%' },
 ];
 
 export const GEO_CONFIG = {
