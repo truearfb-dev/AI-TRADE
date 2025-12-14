@@ -169,7 +169,8 @@ const App: React.FC = () => {
       {/* Live Social Proof - Floating at bottom */}
       <LiveNotification lang={language} />
 
-      <main className="flex-grow p-4 flex flex-col items-center justify-center w-full max-w-md mx-auto relative z-0">
+      {/* Main content z-10 ensures it stays above Footer (z-0) when dropdown overflows */}
+      <main className="flex-grow p-4 flex flex-col items-center justify-center w-full max-w-md mx-auto relative z-10">
         
         {/* Conditional Rendering: Scanner View or Result View */}
         {!signal ? (
@@ -204,7 +205,9 @@ const App: React.FC = () => {
                   {/* Custom Dropdown Menu */}
                   {isDropdownOpen && (
                     <>
-                      <div className="fixed inset-0 z-30" onClick={() => setIsDropdownOpen(false)} />
+                      {/* Dark blurred backdrop to hide footer text/warnings */}
+                      <div className="fixed inset-0 z-30 bg-black/60 backdrop-blur-sm transition-opacity duration-300" onClick={() => setIsDropdownOpen(false)} />
+                      
                       <div className="absolute top-full left-0 right-0 mt-2 bg-[#112240] border border-white/10 rounded-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] max-h-[50vh] overflow-y-auto z-40 animate-in fade-in zoom-in-95 duration-200">
                         {TRADING_PAIRS.map((pair) => (
                           <button
