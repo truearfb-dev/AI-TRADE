@@ -16,13 +16,15 @@ const SESSION_DURATION_MS = 1 * 60 * 60 * 1000; // 1 Hour
 const App: React.FC = () => {
   const [language, setLanguage] = useState<Language>('en');
   
-  // Initialize authentication state from localStorage
+  // Initialize authentication state
+  // WE DO NOT AUTO-LOGIN TELEGRAM USERS. THEY MUST ENTER ID.
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    const savedTimestamp = localStorage.getItem('pocket_ai_login_time');
+    // Check LocalStorage for valid session
+    // Updated key to 'potrade_ai_login_time' for rebranding
+    const savedTimestamp = localStorage.getItem('potrade_ai_login_time');
     if (savedTimestamp) {
       const loginTime = parseInt(savedTimestamp, 10);
       const currentTime = Date.now();
-      // Check if session is still valid (not expired)
       if (currentTime - loginTime < SESSION_DURATION_MS) {
         return true;
       }
@@ -45,8 +47,9 @@ const App: React.FC = () => {
     return '🔴'; // Red for low
   };
 
-  // Register Service Worker for PWA capabilities
+  // --- TELEGRAM & PWA INITIALIZATION ---
   useEffect(() => {
+    // Service Worker for PWA
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
@@ -56,23 +59,48 @@ const App: React.FC = () => {
           console.error('Service Worker registration failed:', error);
         });
     }
+
+    // Telegram Mini App Init (Visual only)
+    if (window.Telegram?.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.ready();
+      tg.expand(); // Force full height
+      
+      // Set colors to match app theme (Dark Navy)
+      // Header color matches the Header component bg
+      tg.setHeaderColor('#112240'); 
+      // Background color matches the App bg
+      tg.setBackgroundColor('#0a192f');
+
+      // Auto-detect language from Telegram if available
+      if (tg.initDataUnsafe?.user?.language_code) {
+        const tgLang = tg.initDataUnsafe.user.language_code.substring(0, 2);
+        if (['en', 'pt', 'es', 'fr'].includes(tgLang)) {
+           setLanguage(tgLang as Language);
+        }
+      }
+    }
   }, []);
 
   // --- LOGIC FOR NOTIFICATIONS ---
   const sendNotification = (title: string, body: string) => {
+    // 1. Haptic Feedback for Telegram
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+    }
+
+    // 2. Browser Notification API
     if (Notification.permission === 'granted') {
-      // Check if service worker is ready to use "showNotification" (better for mobile)
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.ready.then((registration) => {
           registration.showNotification(title, {
             body: body,
             icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png",
-            vibrate: [200, 100, 200], // Vibration pattern
-            tag: 'trading-signal' // Replaces old notification with new one if stacked
+            vibrate: [200, 100, 200],
+            tag: 'trading-signal'
           } as any);
         });
       } else {
-        // Fallback for desktop/simple testing
         new Notification(title, {
           body: body,
           icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
@@ -83,8 +111,6 @@ const App: React.FC = () => {
 
   const generateSignal = useCallback((pairName: string) => {
     const direction: TradeDirection = Math.random() > 0.5 ? 'CALL' : 'PUT';
-    
-    // Generate accuracy between 50% and 95%
     const minAccuracy = 50;
     const maxAccuracy = 95;
     const accuracy = Math.floor(Math.random() * (maxAccuracy - minAccuracy + 1)) + minAccuracy;
@@ -101,15 +127,19 @@ const App: React.FC = () => {
   const handleScan = () => {
     if (isScanning || signal) return;
 
+    // Telegram Haptic Feedback on button press
+    if (window.Telegram?.WebApp?.HapticFeedback) {
+      window.Telegram.WebApp.HapticFeedback.impactOccurred('medium');
+    }
+
     setIsScanning(true);
 
-    // Finalize scan
     setTimeout(() => {
       const newSignal = generateSignal(selectedPair);
       setSignal(newSignal);
       setIsScanning(false);
       
-      // CUSTOMIZE YOUR NOTIFICATION TEXT HERE
+      // Notify (Sound/Haptic/Push)
       const emoji = newSignal.direction === 'CALL' ? '🟢 ⬆️' : '🔴 ⬇️';
       const title = `SIGNAL: ${newSignal.pair} ${emoji}`;
       const body = `Direction: ${newSignal.direction}\nAccuracy: ${newSignal.accuracy}%\nTimeframe: M1`;
@@ -123,9 +153,7 @@ const App: React.FC = () => {
   useEffect(() => {
     if (!isAuthenticated) return;
 
-    // Simulate an incoming signal every 5 minutes (300000ms) purely for notification
     const interval = setInterval(() => {
-      // Only notify if user is NOT currently looking at a signal card
       if (!signal) {
         const randomPair = TRADING_PAIRS[Math.floor(Math.random() * TRADING_PAIRS.length)].name;
         const autoSignal = generateSignal(randomPair);
@@ -136,7 +164,7 @@ const App: React.FC = () => {
         
         sendNotification(title, body);
       }
-    }, 120000); // Trigger every 2 minutes for testing (change to higher value later)
+    }, 120000); 
 
     return () => clearInterval(interval);
   }, [isAuthenticated, signal, generateSignal]);
@@ -146,8 +174,7 @@ const App: React.FC = () => {
   };
 
   const handleLogin = () => {
-    // Save current timestamp to localStorage on successful login
-    localStorage.setItem('pocket_ai_login_time', Date.now().toString());
+    localStorage.setItem('potrade_ai_login_time', Date.now().toString());
     setIsAuthenticated(true);
   };
 

@@ -29,7 +29,7 @@ const Header: React.FC<HeaderProps> = ({ lang, setLang }) => {
     if (Notification.permission === 'granted') {
       // Just toggle visual state locally, usually you'd call api to unsubscribe
       // For this demo, we just show a test notification
-      new Notification("Pocket AI Trader", {
+      new Notification("PO Trade AI", {
         body: "Test notification: System is Active 🟢",
         icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
       });
@@ -43,7 +43,7 @@ const Header: React.FC<HeaderProps> = ({ lang, setLang }) => {
         setNotificationsEnabled(true);
         // Send a test notification immediately to confirm
         navigator.serviceWorker.ready.then((registration) => {
-          registration.showNotification("Pocket AI Connected", {
+          registration.showNotification("PO Trade AI Connected", {
             body: "You will now receive trading signals.",
             icon: "https://cdn-icons-png.flaticon.com/512/3429/3429149.png"
           });

@@ -1,3 +1,4 @@
+
 import { MarketPair } from './types';
 
 export const TRADING_PAIRS: MarketPair[] = [
@@ -105,7 +106,7 @@ export const ANALYSIS_LOGS = {
 
 export const TRANSLATIONS = {
   pt: {
-    appTitle: "POCKET",
+    appTitle: "PO TRADE",
     appSubtitle: "Scanner Pro v2.4",
     statusOnline: "ONLINE",
     statusIdle: "AGUARDANDO",
@@ -134,7 +135,7 @@ export const TRANSLATIONS = {
     seconds: "s"
   },
   en: {
-    appTitle: "POCKET",
+    appTitle: "PO TRADE",
     appSubtitle: "Scanner Pro v2.4",
     statusOnline: "ONLINE",
     statusIdle: "IDLE",
@@ -163,7 +164,7 @@ export const TRANSLATIONS = {
     seconds: "s"
   },
   es: {
-    appTitle: "POCKET",
+    appTitle: "PO TRADE",
     appSubtitle: "Escáner Pro v2.4",
     statusOnline: "EN LÍNEA",
     statusIdle: "ESPERA",
@@ -192,7 +193,7 @@ export const TRANSLATIONS = {
     seconds: "s"
   },
   fr: {
-    appTitle: "POCKET",
+    appTitle: "PO TRADE",
     appSubtitle: "Scanner Pro v2.4",
     statusOnline: "EN LIGNE",
     statusIdle: "ATTENTE",

@@ -1,6 +1,6 @@
 {
-  "name": "Pocket AI Trader",
-  "short_name": "Pocket AI",
+  "name": "PO Trade AI",
+  "short_name": "PO Trade",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0a192f",

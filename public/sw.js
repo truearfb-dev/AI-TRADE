@@ -10,7 +10,7 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', (event) => {
   const data = event.data ? event.data.json() : {};
   
-  const title = data.title || 'Pocket AI Signal';
+  const title = data.title || 'PO Trade Signal';
   const options = {
     body: data.body || 'New trading opportunity detected!',
     icon: 'https://cdn-icons-png.flaticon.com/512/3429/3429149.png',

