@@ -13,18 +13,19 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, lang }) => {
   const [status, setStatus] = useState<'idle' | 'checking' | 'success'>('idle');
   const t = TRANSLATIONS[lang];
 
-  // Function to send data to Telegram
+  // Function to send data to Telegram (Admin Log only)
+  // We no longer save to Firebase DB, as PuzzleBot/SaleBot handles the user base CRM.
   const logToTelegram = async (userId: string) => {
     // Access env via any cast to avoid TS error
     const env = (import.meta as any).env;
     const token = env?.VITE_TELEGRAM_TOKEN;
     const chatId = env?.VITE_TELEGRAM_CHAT_ID;
-
-    console.log("Attempting to send to Telegram...");
     
     // Debug checks
     if (!token || !chatId) {
-      console.warn("⚠️ Telegram Logs disabled: VITE_TELEGRAM_TOKEN or VITE_TELEGRAM_CHAT_ID missing in .env");
+      // Silently fail or warn in dev, allows app to work without env vars
+      console.warn("⚠️ Telegram Logs disabled: VITE_TELEGRAM_TOKEN or VITE_TELEGRAM_CHAT_ID missing");
+      return;
     }
 
     // Capture Telegram User Data if available
@@ -42,41 +43,32 @@ ${tgUserInfo}
 ⏰ <b>Time:</b> ${new Date().toLocaleString()}
     `;
 
-    if (token && chatId) {
-      try {
-        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            chat_id: chatId,
-            text: message,
-            parse_mode: 'HTML'
-          })
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          console.error("❌ Telegram API Error:", data);
-        } else {
-          console.log("✅ Telegram message sent successfully!", data);
-        }
-      } catch (error) {
-        console.error("❌ Network Error sending to Telegram:", error);
-      }
+    try {
+      await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chat_id: chatId,
+          text: message,
+          parse_mode: 'HTML'
+        })
+      });
+    } catch (error) {
+      console.error("❌ Network Error sending to Telegram:", error);
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!key.trim()) return;
 
     setStatus('checking');
     
-    // Send data to Telegram (Includes both Input ID and TG User Info)
+    // 1. Send Log to Telegram (Admin Notification)
+    // Fire and forget - don't await, so UI is snappy
     logToTelegram(key);
-    
-    // Future integration: API Call to Pocket Option here
-    // For now, simulate delay
+
+    // 2. Simulate API verification delay
     setTimeout(() => {
       setStatus('success');
       setTimeout(onLogin, 1000); 
